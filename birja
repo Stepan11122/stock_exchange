@@ -14,7 +14,7 @@ def draw_rotated_rect_hover(surface, x, y, theta_deg, x_r, y_t, mouse_pos,num, c
         ( hw,  hh),
         (-hw,  hh),
     ]
-
+    print("hru12345")
     def rotate_point(px, py, angle):
         return (
             px * math.cos(angle) - py * math.sin(angle),
