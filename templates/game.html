@@ -1,42 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>{{ player|capitalize }}'s Cards</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Multiplayer Card Game</title>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
 </head>
 <body>
-    <h1>{{ player|capitalize }}'s View</h1>
-
-    <div class="table">
-        <h2>Trend:</h2>
-        <ul class="trend">
-            {% for c in game_state.keys()%}
-                {%if player==c%}
-                    <li>trend {{trend[c]}}</li>
-                {%else%}<li>trend {{game_state[c].Turn}}</li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-        <h2>Value:</h2>
-        <ul class="value">
-            {% for c in value %}
-                <li>value {{ c }} {{value[c]}}</li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <form method="POST" class="hand">
-        {% for card in hand %}
-            <button type="submit" name="card" value={{card}} class="card">{{ card }}</button>
-        {% endfor %}
-    </form>
-
-    <div class="switch">
-        <a href="/player1">Switch to Player 1</a> |
-        <a href="/player2">Switch to Player 2</a>
-        <a href="/player3">Switch to Player 3</a>
-        <a href="/player4">Switch to Player 4</a>
-    </div>
+    <h1>Multiplayer Game</h1>
+    <div id="game"></div>
+    <script>
+        const player = prompt("Enter your player ID (player1 - player4):");
+        console.log("BUBUBU");
+        initGame(player);
+    </script>
 </body>
 </html>
