@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ CurrentPlayer|capitalize }}'s Cards</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>{{ CurrentPlayer|capitalize }}'s View</h1>
+
+    <div class="table">
+        <h2>Trend:</h2>
+        <ul class="trend">
+            {% for c in trend %}
+                <li>trend {{ c }} {{trend[c]}}</li>
+            {% endfor %}
+        </ul>
+        <h2>Value:</h2>
+        <ul class="value">
+            {% for c in value %}
+                <li>value {{ c }} {{value[c]}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <form method="POST" class="hand">
+        {% for card in hand %}
+            <button type="submit" name="card" value={{card}} class="card">{{ card }}</button>
+        {% endfor %}
+    </form>
+
+    <div class="switch">
+        <a href="/player1">Switch to Player 1</a> |
+        <a href="/player2">Switch to Player 2</a>
+        <a href="/player3">Switch to Player 3</a>
+        <a href="/player4">Switch to Player 4</a>
+    </div>
+</body>
+</html>
