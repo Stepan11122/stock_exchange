@@ -1,28 +1,20 @@
-from flask import Flask, render_template, request, redirect, url_for
-from models import player
+from flask import Flask, render_template, request
+from flask_socketio import SocketIO, emit
 import random
+from models import player
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
+socketio = SocketIO(app)
 
-deck = [('2','3','4','5','6','7','8','9','10','J','Q','K','A')[i]+('♠','♣','♦','♥')[j] for i in range(0,12) for j in range(0,4)]
+# Game setup
+deck = [r + s for r in ('2','3','4','5','6','7','8','9','10','J','Q','K','A') for s in '♠♣♦♥']
 random.shuffle(deck)
-trend={
-    'player1': '',
-    'player2': '',
-    'player3': '',
-    'player4': '',
-    'Turn':False
-}
-value = {
-    'player1': '',
-    'player2': '',
-    'player3': '',
-    'player4': '',
-    'Turn':False
-}
-# t1. t2, v1, v2
-phase="t1"
+sid_to_player={}
+trend = {'player1': '', 'player2': '', 'player3': '', 'player4': ''}
+value = {'player1': '', 'player2': '', 'player3': '', 'player4': ''}
+phase = "t1"
+
 game_state = {
     'player1': player([deck.pop() for _ in range(10)],True),
     'player2': player([deck.pop() for _ in range(10)],True),
@@ -32,41 +24,61 @@ game_state = {
 
 @app.route('/')
 def index():
-    return redirect(url_for('player_view', CurrentPlayer='player1'))
+    return render_template('game.html')
 
-@app.route('/<CurrentPlayer>', methods=['GET', 'POST'])
-def player_view(CurrentPlayer):
-    if CurrentPlayer not in game_state:
-        return "Unknown player", 404
-    if request.method == 'POST':
-        played_card = request.form.get('card')
-        print(played_card)
-        if  played_card in game_state[CurrentPlayer].Hand and phase=="t1":
-            if game_state[CurrentPlayer].Turn:
-                print("BUBUBU")
-                game_state[CurrentPlayer].Hand.remove(played_card)
-                game_state[CurrentPlayer].Turn=False
-                trend[CurrentPlayer]=played_card
-            else:
-                print("BYBYBY")
-                game_state[CurrentPlayer].Hand.remove(played_card)
-                game_state[CurrentPlayer].Hand.append(trend[CurrentPlayer])
-                trend[CurrentPlayer]=played_card
+@socketio.on('join')
+def handle_join(data):
+    player_id=data.get('player')
+    sid_to_player[request.sid] = player_id
+    emit('update_state', get_public_game_state(), broadcast=True)
 
-        if  played_card in game_state[CurrentPlayer].Hand  and phase=="v1" and game_state[CurrentPlayer].Turn:
-            if game_state[CurrentPlayer].Turn:
-                print("BUBUBU")
-                game_state[CurrentPlayer].Hand.remove(played_card)
-                game_state[CurrentPlayer].Turn = False
-                value.append(played_card)
-            else:
-                print("BYBYBY")
-                game_state[CurrentPlayer].Hand.remove(played_card)
-                game_state[CurrentPlayer].Hand.append(trend[CurrentPlayer])
-                value[CurrentPlayer] = played_card
-    #HARDCODE
-    return render_template('game.html',
-                           player=CurrentPlayer, players=4, hand=game_state[CurrentPlayer].Hand, trend=trend, value=value,game_state=game_state)
+@socketio.on('play_card')
+def handle_play_card(data):
+    global phase
+    card = data['card']
+    player_obj = game_state[sid_to_player[request.sid]]
+    if phase == "t1":
+        print(card)
+        if card in player_obj.Hand:
+            player_obj.Hand.remove(card)
+            trend[sid_to_player[request.sid]] = card
+            print(player_obj.Hand)
+            player_obj.Turn = False
+            """
+            # Advance phase if all submitted
+            if all(p.Turn for p in game_state.values()):
+                phase = "t2"
+                for p in game_state.values():
+                    p.Turn = False
+            """
+        emit('update_state', get_public_game_state(), broadcast=True)
+@socketio.on('change_card')
+def handle_change_card(data):
+    global phase
+    player_id=sid_to_player[request.sid]
+    card = data['card']
+    player_obj = game_state[player_id]
+    if phase=="t1":
+        print(card)
+        if card in player_obj.Hand:
+            print("BYBYBY")
+            player_obj.Hand.append(trend[player_id])
+            player_obj.Hand.remove(card)
+            trend[player_id] = card
+    emit('update_state', get_public_game_state(), broadcast=True)
+def get_public_game_state():
+    return {
+        'players':list(game_state.keys()),
+        'trend': trend,
+        'value': value,
+        'phase': phase,
+        'game_state': {
+            pid: {
+                'Hand': game_state[pid].Hand,
+                'Turn': game_state[pid].Turn
+            } for pid in game_state
+        }
+    }
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)
