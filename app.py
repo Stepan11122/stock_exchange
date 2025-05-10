@@ -5,7 +5,6 @@ import random
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# Simulated game state stored in-memory
 deck = [('2','3','4','5','6','7','8','9','10','J','Q','K','A')[i]+('♠','♣','♦','♥')[j] for i in range(0,12) for j in range(0,4)]
 random.shuffle(deck)
 trend={
@@ -15,7 +14,13 @@ trend={
     'player4': '',
     'Turn':False
 }
-value=[]
+value = {
+    'player1': '',
+    'player2': '',
+    'player3': '',
+    'player4': '',
+    'Turn':False
+}
 # t1. t2, v1, v2
 phase="t1"
 game_state = {
@@ -59,8 +64,9 @@ def player_view(CurrentPlayer):
                 game_state[CurrentPlayer].Hand.remove(played_card)
                 game_state[CurrentPlayer].Hand.append(trend[CurrentPlayer])
                 value[CurrentPlayer] = played_card
+    #HARDCODE
     return render_template('game.html',
-                           player=CurrentPlayer,hand=game_state[CurrentPlayer].Hand, trend=trend, value=value)
+                           player=CurrentPlayer, players=4, hand=game_state[CurrentPlayer].Hand, trend=trend, value=value,game_state=game_state)
 
 if __name__ == '__main__':
     app.run(debug=True)
