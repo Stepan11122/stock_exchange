@@ -2,17 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ CurrentPlayer|capitalize }}'s Cards</title>
+    <title>{{ player|capitalize }}'s Cards</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>{{ CurrentPlayer|capitalize }}'s View</h1>
+    <h1>{{ player|capitalize }}'s View</h1>
 
     <div class="table">
         <h2>Trend:</h2>
         <ul class="trend">
-            {% for c in trend %}
-                <li>trend {{ c }} {{trend[c]}}</li>
+            {% for c in game_state.keys()%}
+                {%if player==c%}
+                    <li>trend {{trend[c]}}</li>
+                {%else%}<li>trend {{game_state[c].Turn}}</li>
+                {% endif %}
             {% endfor %}
         </ul>
         <h2>Value:</h2>
