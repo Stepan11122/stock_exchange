@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Multiplayer Card Game</title>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <!-- Tell the browser this script uses modules -->
+    <script type="module" src="{{ url_for('static', filename='main.js') }}"></script>
+</head>
+<body>
+    <h1>Multiplayer Game</h1>
+    <div id="game"></div>
+    <script type="module">
+        import { initGame } from "{{ url_for('static', filename='main.js') }}";
+        const player = prompt("Enter your player ID (player1 - player4):");
+        initGame(player);
+    </script>
+</body>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    
+    <script>
+        // Безопасная обработка данных из Jinja2
+        try {
+            const cardData = JSON.parse('{{ cards_json | tojson | safe }}');
+            console.log("Card data loaded successfully:", cardData);
+            
+            // Проверка структуры данных
+            if (!Array.isArray(cardData)) {
+                console.error("cardData is not an array!");
+            } else if (cardData.length === 0) {
+                console.warn("cardData is empty!");
+            }
+            
+            // Сохраняем данные в глобальной области видимости
+            window.cardData = cardData;
+        } catch (error) {
+            console.error("Error parsing cardData:", error);
+            window.cardData = []; // Fallback to empty array
+        }
+    </script>
+    
+    <script src="{{ url_for('static', filename='game.js') }}"></script>
+</body>
+</html>

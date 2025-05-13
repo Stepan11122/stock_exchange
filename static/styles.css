@@ -1,0 +1,45 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background: #f0f0f0;
+}
+
+.table {
+    margin-top: 20px;
+}
+
+.trend {
+    list-style: none;
+    padding: 0;
+}
+
+.hand {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #333;
+    padding: 15px 0;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.card {
+    background: white;
+    border: 2px solid black;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.switch {
+    margin-top: 20px;
+}
