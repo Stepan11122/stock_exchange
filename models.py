@@ -17,3 +17,6 @@ class player:
     def __init__(self, hand, turn):
         self.Hand=hand
         self.Turn=turn
+        self.score=[]
+        self.Ace_Turns=[]
+        self.Jack_Turns=[]
