@@ -3,14 +3,15 @@
 <head>
     <title>Multiplayer Card Game</title>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <!-- Tell the browser this script uses modules -->
+    <script type="module" src="{{ url_for('static', filename='main.js') }}"></script>
 </head>
 <body>
     <h1>Multiplayer Game</h1>
     <div id="game"></div>
-    <script>
+    <script type="module">
+        import { initGame } from "{{ url_for('static', filename='main.js') }}";
         const player = prompt("Enter your player ID (player1 - player4):");
-        console.log("BUBUBU");
         initGame(player);
     </script>
 </body>
