@@ -4,7 +4,7 @@ export function renderGame(data, player, socket) {
     const oldTimer = document.getElementById('timer');
     if (oldTimer) oldTimer.remove();
     renderPhaseTitle(container, data.phase);
-    renderHand(container, data, player, socket);
+    if(data.phase!==6) {renderHand(container, data, player, socket);}
     const trendCards = createTrendPlaceholders(container, data.players);
     renderScoreBoard(container, data);
 
@@ -36,6 +36,9 @@ export function renderGame(data, player, socket) {
             renderTrends(trendCards, data, player, data.players, true);
             renderValues(container, data, player,false,true);
             renderTimer(container,data);
+            break;
+        case 6:
+            renderFinalScores(container, data);
             break;
         default:
             container.appendChild(createText('p', 'Not known phase'));
@@ -190,4 +193,31 @@ function renderTimer(container, data){
     timerDisplay.id = 'timer';
     timerDisplay.textContent = `⏳ Time left: ${data.timer}s`;
     container.appendChild(timerDisplay);
+}
+function calculateTotalScores(data) {
+    const scores = {};
+    data.players.forEach(player => {
+        const scoreArray = data.game_state[player].score || [];
+        scores[player] = scoreArray.reduce((a, b) => a + b, 0);
+    });
+    return scores;
+}
+function renderFinalScores(container, data) {
+    const totalScores = calculateTotalScores(data);
+
+    const finalSection = document.createElement('div');
+    finalSection.style.marginTop = '30px';
+
+    finalSection.appendChild(createText('h2', '🏆 Final Scores'));
+
+    data.players
+        .sort((a, b) => totalScores[b] - totalScores[a]) // Descending order
+        .forEach(player => {
+            const p = document.createElement('p');
+            p.style.fontSize = '1.2em';
+            p.textContent = `${player}: ${totalScores[player]} pts`;
+            finalSection.appendChild(p);
+        });
+
+    container.appendChild(finalSection);
 }
