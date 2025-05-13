@@ -7,7 +7,6 @@ import random
 from models import player
 import time
 import threading
-import json
 
 PHASE_5_TIMER=1
 PHASE_1_TIMER=1
